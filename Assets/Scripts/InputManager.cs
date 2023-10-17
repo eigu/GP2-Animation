@@ -13,6 +13,10 @@ public class InputManager : MonoBehaviour
 
     public float moveAmount;
 
+    //new script
+    public bool sprint_Input;
+    public bool walk_Input;
+
     public void OnEnable()
     {
         if (playerControl == null)
@@ -20,6 +24,8 @@ public class InputManager : MonoBehaviour
             playerControl = new PlayerControl();
             //When we hit WASD, record the movement to the variable movementInput using lambda expression
             playerControl.PlayerControls.WASD.performed += i => movementInput = i.ReadValue<Vector2>();
+            playerControl.PlayerActions.Sprint.performed += i => sprint_Input = true;
+            playerControl.PlayerActions.Sprint.canceled += i => sprint_Input = false;
         }
         playerControl.Enable();
     }
@@ -32,6 +38,7 @@ public class InputManager : MonoBehaviour
     public void HandleAllInput()
     {
         HandleMovementInput();
+        HandleSprinting();
     }
 
     //Movement
@@ -41,7 +48,18 @@ public class InputManager : MonoBehaviour
         horizontalInput = movementInput.x;
 
         moveAmount = Mathf.Clamp01(Mathf.Abs(verticalInput) + Mathf.Abs(horizontalInput));
-        PlayerManager.Instance.animatorManager.UpdateAnimatorValues(0, moveAmount);
-
+        PlayerManager.Instance.animatorManager.UpdateAnimatorValues(0, moveAmount,PlayerManager.Instance.isSprinting);
     }
+    //new script
+    private void HandleSprinting()
+    {
+        if (sprint_Input && moveAmount >0.5f)
+        {
+            PlayerManager.Instance.isSprinting = true;
+        }
+        else
+        {
+            PlayerManager.Instance.isSprinting = false;
+        }
+    } 
 }

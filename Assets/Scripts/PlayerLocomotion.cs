@@ -14,6 +14,10 @@ public class PlayerLocomotion : MonoBehaviour
 
     public void HandlesAllMovement()
     {
+        HandlesFallingAndLanding();
+        //if our player is interacting, we will not gonna run the code below
+        if (PlayerManager.Instance.isInteracting)
+            return;
         HandlesMovement();
         HandlesRotation();
     }
@@ -25,9 +29,34 @@ public class PlayerLocomotion : MonoBehaviour
         moveDirection.Normalize();
         moveDirection.y = 0;
 
+        if (PlayerManager.Instance.isSprinting == true)
+        {
+            moveDirection = moveDirection * PlayerManager.Instance.sprintSpeed;
+        }
+        else
+        {
+            if (PlayerManager.Instance.inputManager.moveAmount >= 0.5f)
+            {
+                moveDirection = moveDirection * PlayerManager.Instance.moveSpeed;
+            }
+            else
+            {
+                moveDirection = moveDirection * PlayerManager.Instance.walkingSpeed;
+            }
+
+        }
+       
+        //line that moves the player based on movespeed
+        //speed if we are sprinting
+        //speed if we are walking
+        //speed if we are moving
+
         //line that moves the player based on speed Stats
-        moveDirection = moveDirection * PlayerManager.Instance.moveSpeed;
+       
         Vector3 movementVelocity = moveDirection;
+
+
+     
         PlayerManager.Instance.rigidBody.velocity = movementVelocity;
     }
 
@@ -52,4 +81,40 @@ public class PlayerLocomotion : MonoBehaviour
         transform.rotation = playerRotation;
     }
 
+    private void HandlesFallingAndLanding()
+    {
+        Debug.DrawRay(transform.position, -Vector3.up, Color.green);
+
+        RaycastHit hit;
+        Ray rayCastOrigin = new Ray(transform.position,Vector3.down);
+        //rayCastOrigin.y = rayCastOrigin.y + PlayerManager.Instance.rayCastheight;
+
+
+        if (!PlayerManager.Instance.isGrounded)
+        {
+            if (!PlayerManager.Instance.isInteracting)
+            {
+                PlayerManager.Instance.animatorManager.PlayTargetAnimation("Falling",true);
+            }
+            PlayerManager.Instance.inAirTimer = PlayerManager.Instance.inAirTimer + Time.deltaTime;
+            PlayerManager.Instance.rigidBody.AddForce(transform.forward * PlayerManager.Instance.leapingVelocity);
+            PlayerManager.Instance.rigidBody.AddForce(-Vector3.up * PlayerManager.Instance.fallingSpeed * PlayerManager.Instance.inAirTimer);
+        }
+
+        if (Physics.Raycast(rayCastOrigin,out hit, PlayerManager.Instance.rayCastheight, PlayerManager.Instance.groundLayer))
+        {
+            if (!PlayerManager.Instance.isGrounded && !PlayerManager.Instance.isInteracting)
+            {
+                PlayerManager.Instance.animatorManager.PlayTargetAnimation("Land",true);
+            }
+
+            PlayerManager.Instance.inAirTimer = 0;
+            PlayerManager.Instance.isGrounded = true;
+        }
+        else
+        {
+            PlayerManager.Instance.isGrounded = false;
+        }
+
+    }
 }
