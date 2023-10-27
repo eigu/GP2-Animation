@@ -20,13 +20,17 @@ public class AnimatorManager : MonoBehaviour
     }
     
     //new script, added bool isSprinting
-    public void UpdateAnimatorValues(float horizontalMovement,float verticalMovement, bool isSprinting)
+    public void UpdateAnimatorValues(float horizontalMovement, float verticalMovement, bool isSprinting, bool isWalking)
     {
         if (isSprinting)
         {
             horizontalMovement = 2;
         }
-        PlayerManager.Instance.animator.SetFloat(horizontal, horizontalMovement,0.1f,Time.deltaTime);
-        PlayerManager.Instance.animator.SetFloat(vertical, verticalMovement, 0.1f,Time.deltaTime);
+        else if (isWalking)
+        {
+            verticalMovement = 0.5f;
+        }
+        PlayerManager.Instance.animator.SetFloat(horizontal, horizontalMovement, 0.1f, Time.deltaTime);
+        PlayerManager.Instance.animator.SetFloat(vertical, verticalMovement, 0.1f, Time.deltaTime);
     }
 }

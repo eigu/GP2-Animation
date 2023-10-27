@@ -35,7 +35,7 @@ public class PlayerLocomotion : MonoBehaviour
         }
         else
         {
-            if (PlayerManager.Instance.inputManager.moveAmount >= 0.5f)
+            if (PlayerManager.Instance.inputManager.moveAmount >0.5f)
             {
                 moveDirection = moveDirection * PlayerManager.Instance.moveSpeed;
             }

@@ -24,6 +24,7 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Actions")]
     public bool isSprinting;
+    public bool isWalking;
     public bool isInteracting;
     [Header("Falling")]
     public bool isGrounded;
@@ -61,7 +62,6 @@ public class PlayerManager : MonoBehaviour
     void Update()
     {
         inputManager.HandleAllInput();
-
     }
 
     private void FixedUpdate()
